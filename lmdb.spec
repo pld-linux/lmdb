@@ -41,10 +41,10 @@ developing applications that use %{name}.
 
 %prep
 %setup -q -n %{name}-LMDB_%{version}
-%patch0 -p1
+mv libraries/liblmdb/* .
+%patch0 -p3
 
 %build
-cd libraries/liblmdb
 %{__make} \
 	CC="%{__cc}" \
 	XCFLAGS="%{rpmcflags} %{rpmcppflags}"
@@ -59,7 +59,6 @@ doxygen
 # remove unpackaged files
 rm -f Doxyfile
 rm -rf man # Doxygen generated manpages
-cd ../../
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -67,7 +66,7 @@ rm -rf $RPM_BUILD_ROOT
 # make install expects existing directory tree
 install -d $RPM_BUILD_ROOT{%{_bindir},%{_includedir},%{_libdir},%{_mandir}/man1}
 
-%{__make} -C libraries/liblmdb install \
+%{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT \
 	prefix=%{_prefix} \
 	libprefix=%{_libdir} \
@@ -92,7 +91,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files libs
 %defattr(644,root,root,755)
-%doc libraries/lib%{name}/CHANGES
+%doc CHANGES COPYRIGHT LICENSE
 %attr(755,root,root) %{_libdir}/liblmdb.so.0*
 
 %files devel
