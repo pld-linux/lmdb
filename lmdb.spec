@@ -1,15 +1,19 @@
-%bcond_without	tests
+#
+# Conditional build:
+%bcond_without	tests		# build without tests
+
 Summary:	Memory-mapped key-value database
 Name:		lmdb
 Version:	0.9.16
 Release:	1
 License:	OpenLDAP
 Group:		Libraries
-URL:		http://symas.com/mdb/
 Source0:	https://github.com/LMDB/lmdb/archive/LMDB_%{version}.tar.gz
 # Source0-md5:	0de89730b8f3f5711c2b3a4ba517b648
+URL:		http://symas.com/mdb/
 Patch0:		%{name}-make.patch
 BuildRequires:	doxygen
+BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
 LMDB is an ultra-fast, ultra-compact key-value embedded data store
@@ -18,30 +22,37 @@ it provides the read performance of a pure in-memory database while
 still offering the persistence of standard disk-based databases, and
 is only limited to the size of the virtual address space.
 
-%package        libs
+%package libs
 Summary:	Shared libraries for %{name}
+Group:		Libraries
 
-%description    libs
+%description libs
 The %{name}-libs package contains shared libraries necessary for
 running applications that use %{name}.
 
-%package        devel
+%package devel
 Summary:	Development files for %{name}
-Requires:	%{name} = %{version}-%{release}
+Group:		Development/Libraries
+Requires:	%{name}-libs = %{version}-%{release}
 
-%description    devel
+%description devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
 %setup -q -n %{name}-LMDB_%{version}
-%patch0 -p1 -b .make
+%patch0 -p1
 
 %build
-cd libraries/lib%{name}
+cd libraries/liblmdb
 %{__make} \
 	CC="%{__cc}" \
 	XCFLAGS="%{rpmcflags} %{rpmcppflags}"
+
+%if %{with tests}
+rm -rf testdb
+LD_LIBRARY_PATH=$PWD %{__make} test
+%endif
 
 # Build doxygen documentation
 doxygen
@@ -52,28 +63,21 @@ cd ../../
 
 %install
 rm -rf $RPM_BUILD_ROOT
-cd libraries/lib%{name}
 
 # make install expects existing directory tree
-mkdir -m 0755 -p $RPM_BUILD_ROOT%{_prefix}{/bin,/include}
-mkdir -m 0755 -p $RPM_BUILD_ROOT{%{_libdir},%{_mandir}/man1}
+install -d $RPM_BUILD_ROOT{%{_bindir},%{_includedir},%{_libdir},%{_mandir}/man1}
 
-%{__make} install \
+%{__make} -C libraries/liblmdb install \
 	DESTDIR=$RPM_BUILD_ROOT \
 	prefix=%{_prefix} \
 	libprefix=%{_libdir} \
 	manprefix=%{_mandir}
 
-%if %{with tests}
-rm -rf testdb
-LD_LIBRARY_PATH=$PWD %{__make} test
-%endif
-
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post libs -p /sbin/ldconfig
-%postun libs -p /sbin/ldconfig
+%post	libs -p /sbin/ldconfig
+%postun	libs -p /sbin/ldconfig
 
 %files
 %defattr(644,root,root,755)
