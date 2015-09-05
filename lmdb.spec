@@ -5,7 +5,7 @@
 Summary:	Memory-mapped key-value database
 Name:		lmdb
 Version:	0.9.16
-Release:	1
+Release:	2
 License:	OpenLDAP
 Group:		Libraries
 Source0:	https://github.com/LMDB/lmdb/archive/LMDB_%{version}.tar.gz
@@ -72,6 +72,10 @@ install -d $RPM_BUILD_ROOT{%{_bindir},%{_includedir},%{_libdir},%{_mandir}/man1}
 	libprefix=%{_libdir} \
 	manprefix=%{_mandir}
 
+# rename to have typical 0.0.0 file
+mv $RPM_BUILD_ROOT%{_libdir}/liblmdb.so.{0,0.0.0}
+/sbin/ldconfig -n  $RPM_BUILD_ROOT%{_libdir}
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -92,7 +96,8 @@ rm -rf $RPM_BUILD_ROOT
 %files libs
 %defattr(644,root,root,755)
 %doc CHANGES COPYRIGHT LICENSE
-%attr(755,root,root) %{_libdir}/liblmdb.so.0*
+%attr(755,root,root) %{_libdir}/liblmdb.so.*.*.*
+%ghost %{_libdir}/liblmdb.so.0
 
 %files devel
 %defattr(644,root,root,755)

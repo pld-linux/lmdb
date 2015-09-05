@@ -7,7 +7,7 @@ diff -up lmdb-LMDB_0.9.16/libraries/liblmdb/Makefile.upstream lmdb-LMDB_0.9.16/l
  CFLAGS	= $(THREADS) $(OPT) $(W) $(XCFLAGS)
  LDLIBS	=
  SOLIBS	=
-+SOVERSION = 0.0.0
++SOVERSION = 0
  prefix	= /usr/local
 +binprefix = $(prefix)/bin                                                                     
 +libprefix = $(prefix)/lib              
