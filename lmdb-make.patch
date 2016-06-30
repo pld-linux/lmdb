@@ -1,48 +1,36 @@
 # Patch the main Makefile to allow for a build that complies to packaging guidelines.
 
-diff -up lmdb-LMDB_0.9.16/libraries/liblmdb/Makefile.upstream lmdb-LMDB_0.9.16/libraries/liblmdb/Makefile
---- lmdb-LMDB_0.9.16/libraries/liblmdb/Makefile.upstream	2015-08-14 10:59:31.179144608 +0200
-+++ lmdb-LMDB_0.9.16/libraries/liblmdb/Makefile	2015-08-14 11:05:57.763026045 +0200
-@@ -24,25 +24,30 @@ OPT = -O2 -g
+--- lmdb-LMDB_0.9.18/libraries/liblmdb/Makefile.upstream	2015-08-14 10:59:31.179144608 +0200
++++ lmdb-LMDB_0.9.18/libraries/liblmdb/Makefile	2015-08-14 11:05:57.763026045 +0200
+@@ -26,6 +26,7 @@
  CFLAGS	= $(THREADS) $(OPT) $(W) $(XCFLAGS)
  LDLIBS	=
  SOLIBS	=
 +SOVERSION = 0
  prefix	= /usr/local
-+binprefix = $(prefix)/bin                                                                     
-+libprefix = $(prefix)/lib              
-+includeprefix = $(prefix)/include
-+manprefix = $(prefix)/man
- 
+ exec_prefix = $(prefix)
+ bindir = $(exec_prefix)/bin
+@@ -37,7 +38,7 @@
  ########################################################################
  
  IHDRS	= lmdb.h
 -ILIBS	= liblmdb.a liblmdb.so
-+ILIBS	= liblmdb.so liblmdb.so.$(SOVERSION)
++ILIBS	= liblmdb.a liblmdb.so liblmdb.so.$(SOVERSION)
  IPROGS	= mdb_stat mdb_copy mdb_dump mdb_load
  IDOCS	= mdb_stat.1 mdb_copy.1 mdb_dump.1 mdb_load.1
  PROGS	= $(IPROGS) mtest mtest2 mtest3 mtest4 mtest5
- all:	$(ILIBS) $(PROGS)
- 
- install: $(ILIBS) $(IPROGS) $(IHDRS)
--	for f in $(IPROGS); do cp $$f $(DESTDIR)$(prefix)/bin; done
--	for f in $(ILIBS); do cp $$f $(DESTDIR)$(prefix)/lib; done
--	for f in $(IHDRS); do cp $$f $(DESTDIR)$(prefix)/include; done
--	for f in $(IDOCS); do cp $$f $(DESTDIR)$(prefix)/man/man1; done
-+	for f in $(IPROGS); do cp $$f $(DESTDIR)$(binprefix); done
-+	for f in $(ILIBS); do cp -d $$f $(DESTDIR)$(libprefix); done
-+	for f in $(IHDRS); do cp $$f $(DESTDIR)$(includeprefix); done
-+	for f in $(IDOCS); do cp $$f $(DESTDIR)$(manprefix)/man1; done
+@@ -54,7 +55,7 @@
+ 	for f in $(IDOCS); do cp $$f $(DESTDIR)$(mandir)/man1; done
  
  clean:
 -	rm -rf $(PROGS) *.[ao] *.[ls]o *~ testdb
-+	rm -rf $(PROGS) *.[ao] *.[ls]o* *~ testdb
++	rm -rf $(PROGS) *.[ao] *.[ls]o *.so.* *~ testdb
  
  test:	all
  	rm -rf testdb && mkdir testdb
-@@ -51,20 +56,24 @@ test:	all
+@@ -63,20 +64,24 @@
  liblmdb.a:	mdb.o midl.o
- 	ar rs $@ mdb.o midl.o
+ 	$(AR) rs $@ mdb.o midl.o
  
 -liblmdb.so:	mdb.lo midl.lo
 +liblmdb.so:	liblmdb.so.$(SOVERSION)

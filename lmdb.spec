@@ -3,16 +3,19 @@
 %bcond_without	tests		# build without tests
 
 Summary:	Memory-mapped key-value database
+Summary(pl.UTF-8):	Baza danych klucz-wartość odwzorowywana w pamięci
 Name:		lmdb
-Version:	0.9.16
-Release:	2
+Version:	0.9.18
+Release:	1
 License:	OpenLDAP
-Group:		Libraries
+Group:		Applications/Databases
+#Source0Download: https://github.com/LMDB/lmdb/releases
 Source0:	https://github.com/LMDB/lmdb/archive/LMDB_%{version}.tar.gz
-# Source0-md5:	0de89730b8f3f5711c2b3a4ba517b648
-URL:		http://symas.com/mdb/
+# Source0-md5:	8b7eeb8a6c30b2763581de455d10441b
 Patch0:		%{name}-make.patch
+URL:		http://symas.com/mdb/
 BuildRequires:	doxygen
+Requires:	%{name}-libs = %{version}-%{release}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -22,27 +25,69 @@ it provides the read performance of a pure in-memory database while
 still offering the persistence of standard disk-based databases, and
 is only limited to the size of the virtual address space.
 
+%description -l pl.UTF-8
+LMDB to bardzo szybka i zwarta, wbudowana baza danych klucz-wartość
+rozwijana dla projektu OpenLDAP. Dzięki użyciu plików odwzorowywanych
+w pamięci zapewnia wydajność odczytu analogiczną do bazydanych
+trzymanej w pamięci, oferując jednocześnie trwałość charakterystyczną
+dla baz opartych na dysku oraz ograniczenie wyłącznie rozmiarem
+wirtualnej przestrzeni adresowej.
+
 %package libs
-Summary:	Shared libraries for %{name}
+Summary:	LMDB shared library
+Summary(pl.UTF-8):	Biblioteka współdzielona LMDB
 Group:		Libraries
 
 %description libs
-The %{name}-libs package contains shared libraries necessary for
-running applications that use %{name}.
+This package contains the shared library necessary for running
+applications that use LMDB.
+
+%description libs -l pl.UTF-8
+Ten pakiet zawiera bibliotekę współdzieloną konieczną do uruchamiania
+aplikacji wykorzystujących LMDB.
 
 %package devel
-Summary:	Development files for %{name}
+Summary:	Header files for LMDB library
+Summary(pl.UTF-8):	Plik nagłówkowy LMDB
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
 
 %description devel
-The %{name}-devel package contains libraries and header files for
-developing applications that use %{name}.
+This package contains the header file for developing applications that
+use LMDB.
+
+%description devel -l pl.UTF-8
+Ten pakiet zawiera plik nagłówkowy do tworzenia aplikacji
+wykorzystujących LMDB.
+
+%package static
+Summary:	Static LMDB library
+Summary(pl.UTF-8):	Statyczna biblioteka LMDB
+Group:		Development/Libraries
+Requires:	%{name}-devel = %{version}-%{release}
+
+%description static
+Static LMDB library.
+
+%description static -l pl.UTF-8
+Statyczna biblioteka LMDB.
+
+%package apidocs
+Summary:	LMDB API documentation
+Summary(pl.UTF-8):	Dokumentacja API biblioteki LMDB
+Group:		Documentation
+
+%description apidocs
+LMDB API documentation.
+
+%description apidocs -l pl.UTF-8
+Dokumentacja API biblioteki LMDB.
 
 %prep
 %setup -q -n %{name}-LMDB_%{version}
-mv libraries/liblmdb/* .
-%patch0 -p3
+%patch0 -p1
+
+%{__mv} libraries/liblmdb/* .
 
 %build
 %{__make} \
@@ -56,9 +101,6 @@ LD_LIBRARY_PATH=$PWD %{__make} test
 
 # Build doxygen documentation
 doxygen
-# remove unpackaged files
-rm -f Doxyfile
-rm -rf man # Doxygen generated manpages
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -69,11 +111,10 @@ install -d $RPM_BUILD_ROOT{%{_bindir},%{_includedir},%{_libdir},%{_mandir}/man1}
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT \
 	prefix=%{_prefix} \
-	libprefix=%{_libdir} \
-	manprefix=%{_mandir}
+	libdir=%{_libdir}
 
 # rename to have typical 0.0.0 file
-mv $RPM_BUILD_ROOT%{_libdir}/liblmdb.so.{0,0.0.0}
+%{__mv} $RPM_BUILD_ROOT%{_libdir}/liblmdb.so.{0,0.0.0}
 /sbin/ldconfig -n  $RPM_BUILD_ROOT%{_libdir}
 
 %clean
@@ -101,5 +142,13 @@ rm -rf $RPM_BUILD_ROOT
 
 %files devel
 %defattr(644,root,root,755)
-%{_includedir}/lmdb.h
 %attr(755,root,root) %{_libdir}/liblmdb.so
+%{_includedir}/lmdb.h
+
+%files static
+%defattr(644,root,root,755)
+%{_libdir}/liblmdb.a
+
+%files apidocs
+%defattr(644,root,root,755)
+%doc html/*
