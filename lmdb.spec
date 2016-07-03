@@ -6,7 +6,7 @@ Summary:	Memory-mapped key-value database
 Summary(pl.UTF-8):	Baza danych klucz-wartość odwzorowywana w pamięci
 Name:		lmdb
 Version:	0.9.18
-Release:	1
+Release:	2
 License:	OpenLDAP
 Group:		Applications/Databases
 #Source0Download: https://github.com/LMDB/lmdb/releases
@@ -76,6 +76,9 @@ Statyczna biblioteka LMDB.
 Summary:	LMDB API documentation
 Summary(pl.UTF-8):	Dokumentacja API biblioteki LMDB
 Group:		Documentation
+%if "%{_rpmversion}" >= "5"
+BuildArch:	noarch
+%endif
 
 %description apidocs
 LMDB API documentation.
