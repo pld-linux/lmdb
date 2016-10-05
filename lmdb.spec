@@ -6,7 +6,7 @@ Summary:	Memory-mapped key-value database
 Summary(pl.UTF-8):	Baza danych klucz-wartość odwzorowywana w pamięci
 Name:		lmdb
 Version:	0.9.18
-Release:	2
+Release:	3
 License:	OpenLDAP
 Group:		Applications/Databases
 #Source0Download: https://github.com/LMDB/lmdb/releases
@@ -117,6 +117,7 @@ install -d $RPM_BUILD_ROOT{%{_bindir},%{_includedir},%{_libdir},%{_mandir}/man1}
 	libdir=%{_libdir}
 
 # rename to have typical 0.0.0 file
+ln -sf liblmdb.so.0.0.0 $RPM_BUILD_ROOT%{_libdir}/liblmdb.so
 %{__mv} $RPM_BUILD_ROOT%{_libdir}/liblmdb.so.{0,0.0.0}
 /sbin/ldconfig -n  $RPM_BUILD_ROOT%{_libdir}
 
