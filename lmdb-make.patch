@@ -1,25 +1,25 @@
 # Patch the main Makefile to allow for a build that complies to packaging guidelines.
 
---- lmdb-LMDB_0.9.18/libraries/liblmdb/Makefile.upstream	2015-08-14 10:59:31.179144608 +0200
-+++ lmdb-LMDB_0.9.18/libraries/liblmdb/Makefile	2015-08-14 11:05:57.763026045 +0200
+--- lmdb-LMDB_0.9.22/libraries/liblmdb/Makefile.orig	2018-03-22 16:23:05.000000000 +0100
++++ lmdb-LMDB_0.9.22/libraries/liblmdb/Makefile	2018-04-25 16:19:36.609599029 +0200
 @@ -26,6 +26,7 @@
  CFLAGS	= $(THREADS) $(OPT) $(W) $(XCFLAGS)
  LDLIBS	=
  SOLIBS	=
 +SOVERSION = 0
+ SOEXT	= .so
  prefix	= /usr/local
  exec_prefix = $(prefix)
- bindir = $(exec_prefix)/bin
-@@ -37,7 +38,7 @@
+@@ -38,7 +39,7 @@
  ########################################################################
  
  IHDRS	= lmdb.h
--ILIBS	= liblmdb.a liblmdb.so
-+ILIBS	= liblmdb.a liblmdb.so liblmdb.so.$(SOVERSION)
+-ILIBS	= liblmdb.a liblmdb$(SOEXT)
++ILIBS	= liblmdb.a liblmdb$(SOEXT) liblmdb$(SOEXT).$(SOVERSION)
  IPROGS	= mdb_stat mdb_copy mdb_dump mdb_load
  IDOCS	= mdb_stat.1 mdb_copy.1 mdb_dump.1 mdb_load.1
  PROGS	= $(IPROGS) mtest mtest2 mtest3 mtest4 mtest5
-@@ -54,7 +55,7 @@
+@@ -55,7 +56,7 @@
  	for f in $(IDOCS); do cp $$f $(DESTDIR)$(mandir)/man1; done
  
  clean:
@@ -28,16 +28,16 @@
  
  test:	all
  	rm -rf testdb && mkdir testdb
-@@ -63,20 +64,24 @@
+@@ -64,20 +65,24 @@
  liblmdb.a:	mdb.o midl.o
  	$(AR) rs $@ mdb.o midl.o
  
--liblmdb.so:	mdb.lo midl.lo
-+liblmdb.so:	liblmdb.so.$(SOVERSION)
+-liblmdb$(SOEXT):	mdb.lo midl.lo
++liblmdb$(SOEXT):	liblmdb$(SOEXT).$(SOVERSION)
 +	rm -f $@
 +	ln -s $< $@
 +
-+liblmdb.so.$(SOVERSION):	mdb.lo midl.lo
++liblmdb$(SOEXT).$(SOVERSION):	mdb.lo midl.lo
  #	$(CC) $(LDFLAGS) -pthread -shared -Wl,-Bsymbolic -o $@ mdb.o midl.o $(SOLIBS)
 -	$(CC) $(LDFLAGS) -pthread -shared -o $@ mdb.lo midl.lo $(SOLIBS)
 +	$(CC) $(LDFLAGS) -pthread -shared -Wl,-soname,$@ -o $@ mdb.lo midl.lo $(SOLIBS)

@@ -5,13 +5,13 @@
 Summary:	Memory-mapped key-value database
 Summary(pl.UTF-8):	Baza danych klucz-wartość odwzorowywana w pamięci
 Name:		lmdb
-Version:	0.9.18
-Release:	3
+Version:	0.9.22
+Release:	1
 License:	OpenLDAP
 Group:		Applications/Databases
 #Source0Download: https://github.com/LMDB/lmdb/releases
 Source0:	https://github.com/LMDB/lmdb/archive/LMDB_%{version}.tar.gz
-# Source0-md5:	8b7eeb8a6c30b2763581de455d10441b
+# Source0-md5:	64c6132f481281b7b2ad746ecbfb8423
 Patch0:		%{name}-make.patch
 URL:		http://symas.com/mdb/
 BuildRequires:	doxygen
