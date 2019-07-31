@@ -5,13 +5,14 @@
 Summary:	Memory-mapped key-value database
 Summary(pl.UTF-8):	Baza danych klucz-wartość odwzorowywana w pamięci
 Name:		lmdb
-Version:	0.9.23
+Version:	0.9.24
 Release:	1
 License:	OpenLDAP
 Group:		Applications/Databases
 #Source0Download: https://github.com/LMDB/lmdb/releases
 Source0:	https://github.com/LMDB/lmdb/archive/LMDB_%{version}.tar.gz
-# Source0-md5:	5a57d029e6829e95d159bb6f689880d3
+# Source0-md5:	c3e3474daf4a59685d154cc7fc5c99ad
+Source1:	%{name}.pc.in
 Patch0:		%{name}-make.patch
 URL:		http://symas.com/mdb/
 BuildRequires:	doxygen
@@ -109,7 +110,7 @@ doxygen
 rm -rf $RPM_BUILD_ROOT
 
 # make install expects existing directory tree
-install -d $RPM_BUILD_ROOT{%{_bindir},%{_includedir},%{_libdir},%{_mandir}/man1}
+install -d $RPM_BUILD_ROOT{%{_bindir},%{_includedir},%{_libdir},%{_mandir}/man1,%{_pkgconfigdir}}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT \
@@ -120,6 +121,13 @@ install -d $RPM_BUILD_ROOT{%{_bindir},%{_includedir},%{_libdir},%{_mandir}/man1}
 ln -sf liblmdb.so.0.0.0 $RPM_BUILD_ROOT%{_libdir}/liblmdb.so
 %{__mv} $RPM_BUILD_ROOT%{_libdir}/liblmdb.so.{0,0.0.0}
 /sbin/ldconfig -n  $RPM_BUILD_ROOT%{_libdir}
+
+%{__sed} -e 's:@PREFIX@:%{_prefix}:g' \
+	-e 's:@EXEC_PREFIX@:%{_exec_prefix}:g' \
+	-e 's:@LIBDIR@:%{_libdir}:g' \
+	-e 's:@INCLUDEDIR@:%{_includedir}:g' \
+	-e 's:@PACKAGE_VERSION@:%{version}:g' \
+	%{SOURCE1} >$RPM_BUILD_ROOT%{_pkgconfigdir}/lmdb.pc
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -148,6 +156,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/liblmdb.so
 %{_includedir}/lmdb.h
+%{_pkgconfigdir}/lmdb.pc
 
 %files static
 %defattr(644,root,root,755)
