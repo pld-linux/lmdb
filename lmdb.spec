@@ -77,9 +77,7 @@ Statyczna biblioteka LMDB.
 Summary:	LMDB API documentation
 Summary(pl.UTF-8):	Dokumentacja API biblioteki LMDB
 Group:		Documentation
-%if "%{_rpmversion}" >= "5"
 BuildArch:	noarch
-%endif
 
 %description apidocs
 LMDB API documentation.
