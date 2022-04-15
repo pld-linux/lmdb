@@ -95,7 +95,9 @@ Dokumentacja API biblioteki LMDB.
 %build
 %{__make} \
 	CC="%{__cc}" \
-	XCFLAGS="%{rpmcflags} %{rpmcppflags}"
+	OPT= \
+	XCFLAGS="%{rpmcflags} %{rpmcppflags}" \
+	LDFLAGS="%{rpmldflags}"
 
 %if %{with tests}
 rm -rf testdb
