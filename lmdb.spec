@@ -16,6 +16,7 @@ Source1:	%{name}.pc.in
 Patch0:		%{name}-make.patch
 URL:		http://symas.com/mdb/
 BuildRequires:	doxygen
+BuildRequires:	rpm-build >= 4.6
 Requires:	%{name}-libs = %{version}-%{release}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
