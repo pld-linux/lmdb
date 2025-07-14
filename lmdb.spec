@@ -88,7 +88,7 @@ Dokumentacja API biblioteki LMDB.
 
 %prep
 %setup -q -n %{name}-LMDB_%{version}
-%patch0 -p1
+%patch -P0 -p1
 
 %{__mv} libraries/liblmdb/* .
 
