@@ -28,7 +28,7 @@
  
  test:	all
  	rm -rf testdb && mkdir testdb
-@@ -64,20 +65,24 @@
+@@ -64,21 +65,25 @@
  liblmdb.a:	mdb.o midl.o
  	$(AR) rs $@ mdb.o midl.o
  
@@ -52,6 +52,7 @@
 -mtest4:	mtest4.o liblmdb.a
 -mtest5:	mtest5.o liblmdb.a
 -mtest6:	mtest6.o liblmdb.a
+-mplay:	mplay.o liblmdb.a
 +mdb_stat: mdb_stat.o liblmdb.so
 +mdb_copy: mdb_copy.o liblmdb.so
 +mdb_dump: mdb_dump.o liblmdb.so
@@ -62,6 +63,7 @@
 +mtest4:	mtest4.o liblmdb.so
 +mtest5:	mtest5.o liblmdb.so
 +mtest6:	mtest6.o liblmdb.so
++mplay:	mplay.o liblmdb.so
  
  mdb.o: mdb.c lmdb.h midl.h
  	$(CC) $(CFLAGS) $(CPPFLAGS) -c mdb.c
