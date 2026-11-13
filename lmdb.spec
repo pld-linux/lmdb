@@ -1,23 +1,24 @@
 #
 # Conditional build:
-%bcond_without	tests		# build without tests
+%bcond_without	apidocs		# API documentation
+%bcond_without	tests		# unit tests
 
 Summary:	Memory-mapped key-value database
 Summary(pl.UTF-8):	Baza danych klucz-wartość odwzorowywana w pamięci
 Name:		lmdb
-Version:	0.9.35
+Version:	0.9.36
 Release:	1
 License:	OpenLDAP
 Group:		Applications/Databases
 #Source0Download: https://github.com/LMDB/lmdb/releases
 Source0:	https://github.com/LMDB/lmdb/archive/LMDB_%{version}.tar.gz
-# Source0-md5:	6800a76ba6cce6ed01aba035297e1084
+# Source0-md5:	2d02cbfd6f2d284e535a777fb5b1cded
 Source1:	%{name}.pc.in
 Patch0:		%{name}-make.patch
-URL:		http://symas.com/mdb/
-BuildRequires:	doxygen
+URL:		https://symas.com/lmdb.php
+%{?with_apidocs:BuildRequires:	doxygen}
 BuildRequires:	rpm-build >= 4.6
-Requires:	%{name}-libs = %{version}-%{release}
+Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -52,7 +53,7 @@ aplikacji wykorzystujących LMDB.
 Summary:	Header files for LMDB library
 Summary(pl.UTF-8):	Plik nagłówkowy LMDB
 Group:		Development/Libraries
-Requires:	%{name}-libs = %{version}-%{release}
+Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 
 %description devel
 This package contains the header file for developing applications that
@@ -66,7 +67,7 @@ wykorzystujących LMDB.
 Summary:	Static LMDB library
 Summary(pl.UTF-8):	Statyczna biblioteka LMDB
 Group:		Development/Libraries
-Requires:	%{name}-devel = %{version}-%{release}
+Requires:	%{name}-devel%{?_isa} = %{version}-%{release}
 
 %description static
 Static LMDB library.
@@ -104,8 +105,9 @@ rm -rf testdb
 LD_LIBRARY_PATH=$PWD %{__make} test
 %endif
 
-# Build doxygen documentation
+%if %{with apidocs}
 doxygen
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -150,12 +152,12 @@ rm -rf $RPM_BUILD_ROOT
 %files libs
 %defattr(644,root,root,755)
 %doc CHANGES COPYRIGHT LICENSE
-%attr(755,root,root) %{_libdir}/liblmdb.so.*.*.*
+%{_libdir}/liblmdb.so.*.*.*
 %ghost %{_libdir}/liblmdb.so.0
 
 %files devel
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/liblmdb.so
+%{_libdir}/liblmdb.so
 %{_includedir}/lmdb.h
 %{_pkgconfigdir}/lmdb.pc
 
@@ -163,6 +165,8 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %{_libdir}/liblmdb.a
 
+%if %{with apidocs}
 %files apidocs
 %defattr(644,root,root,755)
 %doc html/*
+%endif
